@@ -1,0 +1,70 @@
+<html lang="en">
+<meta charset="UTF-8">
+
+<head>
+    <style>
+      div { width: 200px; padding-bottom: 20px; }
+      textarea { width: 200px; height: 50px; }
+      button { width: 100px; height: 25px; display: block; }
+
+    </style>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.685.0.min.js"></script>
+
+    <script>
+        var score = function() {
+
+            // process.env.AWS_SDK_LOAD_CONFIG = true;
+            //var AWS = require('aws-sdk');
+
+
+            // Initialize the Amazon Cognito credentials provider
+            // AWS.config.region = 'ap-southeast-2'; // Region
+            // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            //     IdentityPoolId: 'us-east-1:b0e4a736-6006-4680-8215-deeefbf36d15',
+            // });
+
+
+
+            var comprehend = new AWS.Comprehend({region: 'ap-southeast-2'});
+
+            var params = {
+              LanguageCode: 'en',
+              Text: document.getElementById("review").value
+            };
+
+            comprehend.detectSentiment(params, function(err, data) {
+                if (err) alert(err, err.stack);
+                else     alert(data);
+            });
+         }
+
+
+
+        var old_score = function() {
+          var review = document.getElementById("review").value;
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+              alert(xhttp.response.Text);
+              if (this.readyState == 4 && this.status == 200) {
+                 document.getElementById("output").innerHTML += "<div>"+JSON.parse(xhttp.responseText).args.text+"</div>";
+              }
+          };
+          xhttp.open("POST", "https://amw.cognitiveservices.azure.com/text/analytics/v2.1/sentiment/post?text="+review, true);
+          xhttp.SetRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send();
+        }
+
+
+    </script>
+</head>
+
+<body>
+<div>Enter your review:</div>
+<form onsubmit="return false">
+    <textarea id="review"></textarea>
+    <button onclick="score();">Score it!</button>
+</form>
+<div id="output"></div>
+</body>
+</html>
